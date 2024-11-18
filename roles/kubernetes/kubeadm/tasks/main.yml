@@ -57,19 +57,37 @@
   set_fact:
     kubeadmConfig_api_version: v1beta3
 
+- name: Get kubeconfig for join discovery process
+  command: "{{ kubectl }} -n kube-public get cm cluster-info -o jsonpath='{.data.kubeconfig}'"
+  register: kubeconfig_file_discovery
+  run_once: true
+  delegate_to: "{{ groups['kube_control_plane'] | first }}"
+  when: kubeadm_use_file_discovery
+
+- name: Copy discovery kubeconfig
+  copy:
+    dest: "{{ kube_config_dir }}/cluster-info-discovery-kubeconfig.yaml"
+    content: "{{ kubeconfig_file_discovery.stdout }}"
+    owner: "root"
+    mode: "0644"
+  when:
+    - not is_kube_master
+    - not kubelet_conf.stat.exists
+    - kubeadm_use_file_discovery
+
 - name: Create kubeadm client config
   template:
     src: "kubeadm-client.conf.{{ kubeadmConfig_api_version }}.j2"
     dest: "{{ kube_config_dir }}/kubeadm-client.conf"
     backup: yes
-    mode: 0640
+    mode: "0640"
   when: not is_kube_master
 
 - name: Kubeadm | Create directory to store kubeadm patches
   file:
     path: "{{ kubeadm_patches.dest_dir }}"
     state: directory
-    mode: 0640
+    mode: "0640"
   when: kubeadm_patches is defined and kubeadm_patches.enabled
 
 - name: Kubeadm | Copy kubeadm patches from inventory files
@@ -77,7 +95,7 @@
     src: "{{ kubeadm_patches.source_dir }}/"
     dest: "{{ kubeadm_patches.dest_dir }}"
     owner: "root"
-    mode: 0644
+    mode: "0644"
   when: kubeadm_patches is defined and kubeadm_patches.enabled
 
 - name: Join to cluster if needed
