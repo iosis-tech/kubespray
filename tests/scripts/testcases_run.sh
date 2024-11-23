@@ -15,6 +15,14 @@ else
   fi
 fi
 
+# Check out latest tag if testing upgrade
+if [ "${UPGRADE_TEST}" != "false" ]; then
+  git fetch --all && git checkout "$KUBESPRAY_VERSION"
+  # Checkout the current tests/ directory ; even when testing old version,
+  # we want the up-to-date test setup/provisionning
+  git checkout "${CI_COMMIT_SHA}" -- tests/
+fi
+
 # needed for ara not to complain
 export TZ=UTC
 
@@ -22,8 +30,9 @@ export ANSIBLE_REMOTE_USER=$SSH_USER
 export ANSIBLE_BECOME=true
 export ANSIBLE_BECOME_USER=root
 export ANSIBLE_CALLBACK_PLUGINS="$(python -m ara.setup.callback_plugins)"
+export ANSIBLE_INVENTORY=${CI_PROJECT_DIR}/inventory/sample/
 
-cd tests && make create-${CI_PLATFORM} -s ; cd -
+make -C tests INVENTORY_DIR=${ANSIBLE_INVENTORY} create-${CI_PLATFORM} -s
 ansible-playbook tests/cloud_playbooks/wait-for-ssh.yml
 
 # Flatcar Container Linux needs auto update disabled
@@ -41,23 +50,13 @@ if [[ "$CI_JOB_NAME" =~ "opensuse" ]]; then
   ansible all -m raw -a 'zypper --gpg-auto-import-keys refresh'
 fi
 
-# Check out latest tag if testing upgrade
-test "${UPGRADE_TEST}" != "false" && git fetch --all && git checkout "$KUBESPRAY_VERSION"
-# Checkout the CI vars file so it is available
-test "${UPGRADE_TEST}" != "false" && git checkout "${CI_COMMIT_SHA}" tests/files/${CI_JOB_NAME}.yml
-test "${UPGRADE_TEST}" != "false" && git checkout "${CI_COMMIT_SHA}" ${CI_TEST_REGISTRY_MIRROR}
-test "${UPGRADE_TEST}" != "false" && git checkout "${CI_COMMIT_SHA}" ${CI_TEST_SETTING}
-
-
 run_playbook () {
 playbook=$1
 shift
 # We can set --limit here and still pass it as supplemental args because `--limit`  is a 'last one wins' option
-ansible-playbook --limit "all:!fake_hosts" \
-     $ANSIBLE_LOG_LEVEL \
-    -e @${CI_TEST_SETTING} \
-    -e @${CI_TEST_REGISTRY_MIRROR} \
-    -e @${CI_TEST_VARS} \
+ansible-playbook \
+    -e @tests/common_vars.yml \
+    -e @tests/files/${CI_JOB_NAME}.yml \
     -e local_release_dir=${PWD}/downloads \
     "$@" \
     ${playbook}
@@ -67,8 +66,10 @@ ansible-playbook --limit "all:!fake_hosts" \
 run_playbook cluster.yml
 
 # Repeat deployment if testing upgrade
-case "${UPGRADE_TEST}" in
+if [ "${UPGRADE_TEST}" != "false" ]; then
+  git checkout "${CI_COMMIT_SHA}"
 
+  case "${UPGRADE_TEST}" in
     "basic")
         run_playbook cluster.yml
         ;;
@@ -77,12 +78,13 @@ case "${UPGRADE_TEST}" in
         ;;
     *)
         ;;
-esac
+  esac
+fi
 
 # Test control plane recovery
 if [ "${RECOVER_CONTROL_PLANE_TEST}" != "false" ]; then
-    run_playbook reset.yml --limit "${RECOVER_CONTROL_PLANE_TEST_GROUPS}:!fake_hosts" -e reset_confirmation=yes
-    run_playbook recover-control-plane.yml -e etcd_retries=10 --limit "etcd:kube_control_plane:!fake_hosts"
+    run_playbook reset.yml --limit "${RECOVER_CONTROL_PLANE_TEST_GROUPS}" -e reset_confirmation=yes
+    run_playbook recover-control-plane.yml -e etcd_retries=10 --limit "etcd:kube_control_plane"
 fi
 
 # Test collection build and install by installing our collection, emptying our repository, adding
@@ -118,7 +120,7 @@ EOF
 
 fi
 # Tests Cases
-## Test Master API
+## Test Control Plane API
 run_playbook tests/testcases/010_check-apiserver.yml
 run_playbook tests/testcases/015_check-nodes-ready.yml
 

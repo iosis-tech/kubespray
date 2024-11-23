@@ -2,7 +2,7 @@
 - name: Kubernetes Apps | Wait for kube-apiserver
   uri:
     url: "{{ kube_apiserver_endpoint }}/healthz"
-    validate_certs: no
+    validate_certs: false
     client_cert: "{{ kube_apiserver_client_cert }}"
     client_key: "{{ kube_apiserver_client_key }}"
   register: result
@@ -58,13 +58,6 @@
     - rbac_enabled
     - inventory_hostname == groups['kube_control_plane'][0]
   tags: node-webhook
-
-- name: Configure Oracle Cloud provider
-  include_tasks: oci.yml
-  tags: oci
-  when:
-    - cloud_provider is defined
-    - cloud_provider == 'oci'
 
 - name: PriorityClass | Copy k8s-cluster-critical-pc.yml file
   copy:

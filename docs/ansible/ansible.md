@@ -42,14 +42,6 @@ The inventory is composed of 3 groups:
 * **kube_control_plane** : list of servers where kubernetes control plane components (apiserver, scheduler, controller) will run.
 * **etcd**: list of servers to compose the etcd server. You should have at least 3 servers for failover purpose.
 
-Note: do not modify the children of _k8s_cluster_, like putting
-the _etcd_ group into the _k8s_cluster_, unless you are certain
-to do that and you have it fully contained in the latter:
-
-```ShellSession
-etcd ⊂ k8s_cluster => kube_node ∩ etcd = etcd
-```
-
 When _kube_node_ contains _etcd_, you define your etcd cluster to be as well schedulable for Kubernetes workloads.
 If you want it a standalone, make sure those groups do not intersect.
 If you want the server to act both as control-plane and node, the server must be defined
@@ -61,6 +53,9 @@ There are also two special groups:
 
 * **calico_rr** : explained for [advanced Calico networking cases](/docs/CNI/calico.md)
 * **bastion** : configure a bastion host if your nodes are not directly reachable
+
+Lastly, the **k8s_cluster** is dynamically defined as the union of **kube_node**, **kube_control_plane** and **calico_rr**.
+This is used internally and for the purpose of defining whole cluster variables (`<inventory>/group_vars/k8s_cluster/*.yml`)
 
 Below is a complete inventory example:
 
@@ -89,10 +84,6 @@ node3
 node4
 node5
 node6
-
-[k8s_cluster:children]
-kube_node
-kube_control_plane
 ```
 
 ## Group vars and overriding variables precedence
@@ -155,6 +146,7 @@ The following tags are defined in playbooks:
 | container_engine_accelerator   | Enable nvidia accelerator for runtimes                |
 | container-engine               | Configuring container engines                         |
 | container-runtimes             | Configuring container runtimes                        |
+| control-plane                  | Configuring K8s control plane node role               |
 | coredns                        | Configuring coredns deployment                        |
 | crio                           | Configuring crio container engine for hosts           |
 | crun                           | Configuring crun runtime                              |
@@ -182,8 +174,6 @@ The following tags are defined in playbooks:
 | init                           | Windows kubernetes init nodes                         |
 | iptables                       | Flush and clear iptable when resetting                |
 | k8s-pre-upgrade                | Upgrading K8s cluster                                 |
-| k8s-secrets                    | Configuring K8s certs/keys                            |
-| k8s-gen-tokens                 | Configuring K8s tokens                                |
 | kata-containers                | Configuring kata-containers runtime                   |
 | krew                           | Install and manage krew                               |
 | kubeadm                        | Roles linked to kubeadm tasks                         |
@@ -199,7 +189,7 @@ The following tags are defined in playbooks:
 | local-path-provisioner         | Configure External provisioner: local-path            |
 | local-volume-provisioner       | Configure External provisioner: local-volume          |
 | macvlan                        | Network plugin macvlan                                |
-| master                         | Configuring K8s master node role                      |
+| master (DEPRECATED)            | Deprecated - see `control-plane`                      |
 | metallb                        | Installing and configuring metallb                    |
 | metrics_server                 | Configuring metrics_server                            |
 | netchecker                     | Installing netchecker K8s app                         |
@@ -210,7 +200,7 @@ The following tags are defined in playbooks:
 | node                           | Configuring K8s minion (compute) node role            |
 | nodelocaldns                   | Configuring nodelocaldns daemonset                    |
 | node-label                     | Tasks linked to labeling of nodes                     |
-| node-webhook                   | Tasks linked to webhook (grating access to resources) |
+| node-webhook                   | Tasks linked to webhook (granting access to resources)|
 | nvidia_gpu                     | Enable nvidia accelerator for runtimes                |
 | oci                            | Cloud provider: oci                                   |
 | persistent_volumes             | Configure csi volumes                                 |

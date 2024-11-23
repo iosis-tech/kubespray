@@ -103,13 +103,12 @@ dependencies:
     tags:
       - container_engine_accelerator
 
-  - role: kubernetes-apps/cloud_controller/oci
+  - role: kubernetes-apps/gateway_api
     when:
-      - cloud_provider is defined
-      - cloud_provider == "oci"
+      - gateway_api_enabled
       - inventory_hostname == groups['kube_control_plane'][0]
     tags:
-      - oci
+      - gateway_api
 
   - role: kubernetes-apps/metallb
     when:

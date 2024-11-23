@@ -7,7 +7,7 @@
     set_fact:
       download_force_cache: "{{ true if download_run_once else download_force_cache }}"
 
-  - name: Download_file | Show url of file to dowload
+  - name: Download_file | Show url of file to download
     debug:
       msg: "{{ download.url }}"
     run_once: "{{ download_run_once }}"
@@ -24,13 +24,13 @@
       owner: "{{ download.owner | default(omit) }}"
       mode: "0755"
       state: directory
-      recurse: yes
+      recurse: true
 
   - name: Download_file | Create local cache directory
     file:
       path: "{{ file_path_cached | dirname }}"
       state: directory
-      recurse: yes
+      recurse: true
     delegate_to: localhost
     connection: local
     delegate_facts: false
@@ -45,7 +45,7 @@
     file:
       path: "{{ file_path_cached | dirname }}"
       state: directory
-      recurse: yes
+      recurse: true
     delegate_to: "{{ download_delegate }}"
     delegate_facts: false
     run_once: true

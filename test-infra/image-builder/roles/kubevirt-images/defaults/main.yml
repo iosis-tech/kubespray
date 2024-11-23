@@ -41,17 +41,24 @@ images:
     converted: true
     tag: "latest"
 
+  fedora-39:
+    filename: Fedora-Cloud-Base-39-1.5.x86_64.qcow2
+    url: https://download.fedoraproject.org/pub/fedora/linux/releases/39/Cloud/x86_64/images/Fedora-Cloud-Base-39-1.5.x86_64.qcow2
+    checksum: sha256:ab5be5058c5c839528a7d6373934e0ce5ad6c8f80bd71ed3390032027da52f37
+    converted: true
+    tag: "latest"
+
+  fedora-40:
+    filename: Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
+    url: https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
+    checksum: sha256:ac58f3c35b73272d5986fa6d3bc44fd246b45df4c334e99a07b3bbd00684adee
+    converted: true
+    tag: "latest"
+
   fedora-coreos:
     filename: fedora-coreos-32.20200601.3.0-openstack.x86_64.qcow2.xz
     url: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/32.20200601.3.0/x86_64/fedora-coreos-32.20200601.3.0-openstack.x86_64.qcow2.xz
     checksum: sha256:fe78c348189d745eb5f6f80ff9eb2af67da8e84880d264f4301faaf7c2a72646
-    converted: true
-    tag: "latest"
-
-  centos-7:
-    filename: CentOS-7-x86_64-GenericCloud-2009.qcow2
-    url: http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-2211.qcow2
-    checksum: sha256:284aab2b23d91318f169ff464bce4d53404a15a0618ceb34562838c59af4adea
     converted: true
     tag: "latest"
 
@@ -115,5 +122,19 @@ images:
     filename: openSUSE-Leap-15.3.x86_64-1.0.1-NoCloud-Build2.63.qcow2
     url: https://download.opensuse.org/repositories/Cloud:/Images:/Leap_15.3/images/openSUSE-Leap-15.3.x86_64-1.0.1-NoCloud-Build2.63.qcow2
     checksum: sha256:289248945e2d058551c71c1bdcb31a361cefe7136c7fd88a09b524eedfaf5215
+    converted: true
+    tag: "latest"
+
+  openeuler-2203:
+    filename: openEuler-22.03-LTS-SP4-x86_64.qcow2.xz
+    url: https://mirrors.ocf.berkeley.edu/openeuler/openEuler-22.03-LTS-SP4/virtual_machine_img/x86_64/openEuler-22.03-LTS-SP4-x86_64.qcow2.xz
+    checksum: sha256:2dc9c9d73d172af0443d1a17786ee2e387006b9912fad24b5497ef103ecd7afb
+    converted: true
+    tag: "latest"
+
+  openeuler-2403:
+    filename: openEuler-24.03-LTS-x86_64.qcow2.xz
+    url: https://mirrors.ocf.berkeley.edu/openeuler/openEuler-24.03-LTS/virtual_machine_img/x86_64/openEuler-24.03-LTS-x86_64.qcow2.xz
+    checksum: sha256:c6af522d36d659b66da668cc4eb86b032a9cff05a95a0e37505a63e70ed585dc
     converted: true
     tag: "latest"
