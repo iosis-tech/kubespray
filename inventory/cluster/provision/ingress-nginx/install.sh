@@ -1,4 +1,4 @@
-kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/v3.5.0/deploy/crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/v3.7.1/deploy/crds.yaml
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
@@ -13,7 +13,7 @@ helm install nginx-ingress-prod ingress-nginx/ingress-nginx \
 --set controller.ingressClassResource.enabled=true \
 --set controller.ingressClassResource.default=true \
 --set controller.ingressClassResource.controllerValue=k8s.io/nginx-ingress-prod \
---version 4.7.5
+--version 4.11.3
 
 # loadBalancerIP="0.0.0.0" it automatically set with kube vip network dns server specifies ip
 helm install nginx-ingress-dev ingress-nginx/ingress-nginx \
@@ -26,7 +26,7 @@ helm install nginx-ingress-dev ingress-nginx/ingress-nginx \
 --set controller.ingressClassResource.enabled=true \
 --set controller.ingressClassResource.default=false \
 --set controller.ingressClassResource.controllerValue=k8s.io/nginx-ingress-dev \
---version 4.7.5
+--version 4.11.3
 
 # loadBalancerIP="0.0.0.0" it automatically set with kube vip network dns server specifies ip
 helm install nginx-ingress-internal ingress-nginx/ingress-nginx \
@@ -39,4 +39,4 @@ helm install nginx-ingress-internal ingress-nginx/ingress-nginx \
 --set controller.ingressClassResource.enabled=true \
 --set controller.ingressClassResource.default=false \
 --set controller.ingressClassResource.controllerValue=k8s.io/nginx-ingress-internal \
---version 4.7.5
+--version 4.11.3
