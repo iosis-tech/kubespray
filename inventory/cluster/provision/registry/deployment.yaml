@@ -32,19 +32,12 @@ spec:
             claimName: registry-pv-claim
       containers:
         - name: registry
-          image: docker.io/registry
+          image: registry:2.8.1
           ports:
             - containerPort: 5000
           volumeMounts:
             - mountPath: "/var/lib/registry"
               name: registry-pv-storage
-          resources:
-            requests:
-              cpu: 250m
-              memory: 250Mi
-            limits:
-              cpu: 1000m
-              memory: 1000Mi
 ---
 apiVersion: v1
 kind: Service
@@ -63,8 +56,8 @@ kind: Ingress
 metadata:
   name: registry-ingress
   annotations:
-      kubernetes.io/ingress.class: "nginx-ingress-internal"
-      nginx.ingress.kubernetes.io/proxy-body-size: 0
+    kubernetes.io/ingress.class: "nginx-ingress-internal"
+    nginx.ingress.kubernetes.io/proxy-body-size: 0
 spec:
   ingressClassName: nginx-ingress-internal
   tls:
